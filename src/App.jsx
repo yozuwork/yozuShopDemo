@@ -1,15 +1,16 @@
-import { useReducer } from 'react'
-import { CartContext, reducer , initialState } from './store'
+
+import { Routes , Route } from 'react-router-dom'
+import Login from './pages/login'
 import './App.css'
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const contextValue = { state, dispatch }; 
   return (
     <>
-       <CartContext.Provider  value={contextValue}>
-          <h1>hi</h1>
-       </CartContext.Provider>
+       <div className="App">
+          <Routes>
+             <Route path="/login" element={<Login/>}></Route>
+          </Routes>
+       </div>
     </>
   )
 }
