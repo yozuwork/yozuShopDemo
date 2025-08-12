@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Login() {
+  const navigate  = useNavigate();
+  const [loginState,setLoginState] = useState(); 
   const api = import.meta.env.VITE_REACT_APP_API_URL;
   const [data, setData] = useState({
     username: '',
@@ -25,8 +27,8 @@ export default function Login() {
       const res = await axios.post(`${api}/v2/admin/signin`, data);
       //解構token與有限時間
       const { token , expired } = res.data;
-      //把解構的token 跟expired 存到自己的cookie裡面
-      document.cookie = `hexToken=${token};  expired=${new Date(expired)}`;
+      //把解構的token 跟expired 存到自己的cookie裡面 加上 path=/，讓 cookie 對整個網域有效
+      document.cookie = `hexToken=${token};  expires=${new Date(expired)} path=/`;
       
       //取得token 
       const Nowtoken = document.cookie
@@ -36,9 +38,14 @@ export default function Login() {
        console.log(Nowtoken);
       //把 Nowtoken 這個變數的值（你的登入 token）設定成 axios 預設的全域 HTTP 請求標頭中的 Authorization 欄位
       axios.defaults.headers.common['Authorization'] = Nowtoken;
+
+      if(res.data.success){
+        navigate('/admin/products');
+      }
       
     } catch (error) {
       console.error(error);
+      setLoginState(error.response.data);
     }
   };
 
@@ -57,9 +64,13 @@ export default function Login() {
 
         {/* Title */}
         <h2 className="text-center text-white text-lg font-semibold mb-6">
-          Sign in to your account
+         請登入
         </h2>
-
+        {loginState && (
+            <h2 className="mt-4 text-red-600 bg-white px-4 py-2 rounded">
+              登入失敗
+            </h2>
+          )}
         {/* Form */}
         <form onSubmit={submit} className="w-full space-y-4">
           {/* Email */}
